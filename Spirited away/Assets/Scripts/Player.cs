@@ -2,6 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/**
+* Player Class.
+* In charge of managing the functionalities of a player.
+**/
 public class Player: MonoBehaviour {
     public float velocityX;
     public float increasedSpeed;
@@ -10,14 +14,14 @@ public class Player: MonoBehaviour {
     public GameObject minimum;
     public GameObject maximum;
 
-    // Start is called before the first frame update
+    /** Initialize the variables. **/ 
     void Start() {
         gameHandler = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameHandler>();
         minimum = GameObject.Find("Minimum");
         maximum = GameObject.Find("Maximum");
     }
 
-    // Update is called once per frame
+    /** Set up movement, fly status and music type once user clicks. **/ 
     void Update() {
         if (alive) {
             if (Input.GetMouseButtonDown(0)) {
@@ -28,16 +32,22 @@ public class Player: MonoBehaviour {
         }
     }
 
+    /**
+    * Unity function for physics processing
+    * allowing to increase the speed in x.
+    **/ 
     void FixedUpdate() {
         GetComponent<Rigidbody2D>().velocity = new Vector2(
             velocityX, GetComponent<Rigidbody2D>().velocity.y
         );
-    }
+    }   
 
+    /** Assign false to fly in case it stops. **/ 
     void restoreIdle() {
         GetComponent<Animator>().SetBool("fly", false);
     }
 
+    /** Detect collision. **/ 
     void OnCollisionEnter2D(Collision2D collider) {
         if (alive) {
             gameHandler.playSFX(4);
@@ -45,6 +55,7 @@ public class Player: MonoBehaviour {
         }
     }
 
+    /** Verify that it does not exceed the limits. **/ 
     void checkLimits() {
         if (alive) {
             if (transform.position.y > maximum.transform.position.y) {
@@ -58,6 +69,7 @@ public class Player: MonoBehaviour {
         }
     }
 
+    /** When dead perform the following functions. **/ 
     void isDeath() {
         GetComponent<Rigidbody2D>().velocity = new Vector2(0, 0);
         gameHandler.lost();
@@ -65,8 +77,11 @@ public class Player: MonoBehaviour {
         alive = false;
         gameHandler.lost();
         GetComponent<Rigidbody2D>().freezeRotation = false;
+        gameHandler.replay.SetActive(true);
+        gameHandler.backToMenu.SetActive(true);
     }
 
+    /** Constantly check limits. **/ 
     void LateUpdate() {
         checkLimits();
     }
